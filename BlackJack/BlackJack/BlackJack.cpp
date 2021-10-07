@@ -9,11 +9,10 @@ int arrayOfCards[52];
 int position = 0;
 
 int dealerCards[10];
-
 int playerCards[10];
 
-int playerMoney = 1000;
-int playerBet;
+double playerMoney = 1000;
+double playerBet;
 char playerAnswer;
 
 //initialize functions;
@@ -24,14 +23,21 @@ int CalculatePlayerCardSum();
 int CalculateDealerCardSum();
 void PlayerDrawing();
 void DealerDrawing();
-void PlayerWins();
+void CalculateEndScores();
+void PlayerWins(bool isBlackJack = false);
 void DealerWins();
 void Tie();
+void Restart();
 
 int main()
 {
 	srand(time(0));
 	PopulateArray();
+
+
+	cout << "Welcome to BlackJack C++ game. \n";
+	Sleep(1000);
+
 	StartOfGame();
 
 }
@@ -62,8 +68,6 @@ void PopulateArray()
 
 void StartOfGame()
 {
-	cout << "Welcome to BlackJack C++ game. \n";
-	Sleep(1000);
 	cout <<	"Please provide you bet. You have " << playerMoney << "EUR now. \n";
 	cin >> playerBet;
 
@@ -97,17 +101,20 @@ void StartOfGame()
 
 	if (pCardSum == 21 && hCardSum == 21)
 	{
-		//tie
+		Tie();
 		return;
 	}
 	else if (pCardSum == 21)
 	{
 		//player wins
+		PlayerWins(true);
 		return;
 	}
 	else if (hCardSum == 21)
 	{
-		// house wins
+		//house wins
+		cout << "Dealer's second card is: " << dealerCards[1] << " \n";
+		DealerWins();
 		return;
 	}
 	
@@ -125,6 +132,7 @@ void StartOfGame()
 	if (CalculatePlayerCardSum() > 21)
 	{
 		cout << "You bust. \n";
+		DealerWins();
 		return;
 	}
 
@@ -156,6 +164,7 @@ void PlayerDrawing()
 				Sleep(1500);
 				if (playerSum > 21)
 				{
+					DealerWins();
 					return;
 				}
 				break;
@@ -200,30 +209,79 @@ void DealerDrawing()
 				if (dealerSum > 21)
 				{
 					cout << "Dealer bust. \n";
+					PlayerWins();
 					return;
 				}
 				break;
 			}
 		}
-
 	}
+	CalculateEndScores();
 }
 
-void PlayerWins()
+void PlayerWins(bool isBlackJack)
 {
-
+	cout << "You win! \n";
+	if (isBlackJack)
+	{
+		playerMoney += (2 * playerBet) + (playerBet / 2);
+	}
+	playerMoney += (2 * playerBet);
+	cout << "Your total amount of money is: " << playerMoney << "\n";
+	Restart();
 }
 
 void DealerWins()
 {
-
+	cout << "You lost! \n";
+	cout << "Your total amount of money is: " << playerMoney << "\n";
+	Restart();
 }
 
 void Tie()
 {
+	cout << "Tie! \n";
+	playerMoney += playerBet;
+	cout << "Your total amount of money is: " << playerMoney << "\n";
+	Restart();
 
 }
 
+
+void Restart()
+{
+	playerBet = 0;
+	
+	for (int i = 0; i < 10; i++)
+	{
+		playerCards[i] = 0;
+		dealerCards[i] = 0;
+	}
+	position = 0;
+	PopulateArray();
+	cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+
+	StartOfGame();
+}
+
+void CalculateEndScores()
+{
+	int dealerEndScore = CalculateDealerCardSum();
+	int playerEndScore = CalculatePlayerCardSum();
+
+	if (playerEndScore > dealerEndScore)
+	{
+		PlayerWins();
+	}
+	else if (playerEndScore < dealerEndScore)
+	{
+		DealerWins();
+	}
+	else
+	{
+		Tie();
+	}
+}
 
 int CalculatePlayerCardSum()
 {
