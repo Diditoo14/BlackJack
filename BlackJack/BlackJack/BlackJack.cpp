@@ -1,5 +1,6 @@
 #include <iostream>
 #include<windows.h>
+#include <time.h>
 using namespace std;
 
 
@@ -7,14 +8,9 @@ using namespace std;
 int arrayOfCards[52];
 int position = 0;
 
-int hCard1;
-int hCard2;
+int dealerCards[10];
 
-int pCard1;
-int pCard2;
-
-int hCardSum;
-int pCardSum;
+int playerCards[10];
 
 int playerMoney = 1000;
 int playerBet;
@@ -24,9 +20,17 @@ char playerAnswer;
 void PopulateArray();
 void StartOfGame();
 int GetRandomCard();
+int CalculatePlayerCardSum();
+int CalculateDealerCardSum();
+void PlayerDrawing();
+void DealerDrawing();
+void PlayerWins();
+void DealerWins();
+void Tie();
 
 int main()
 {
+	srand(time(0));
 	PopulateArray();
 	StartOfGame();
 
@@ -43,11 +47,13 @@ void PopulateArray()
 		}
 	}
 
+	//all cards with value of 10
 	for (int x = 1; x <= 16; x++)
 	{
 		arrayOfCards[position++] = 10;
 	}
 
+	//all cards with value of 11 or 1 (Aces)
 	for (int z = 1; z <= 4; z++)
 	{
 		arrayOfCards[position++] = 11;
@@ -70,29 +76,24 @@ void StartOfGame()
 	cout << "Your bet is " << playerBet << "EUR. \n";
 	playerMoney -= playerBet;
 
-	pCard1 = GetRandomCard();
-	pCard2 = GetRandomCard();
-	hCard1 = GetRandomCard();
-	hCard2 = GetRandomCard();
+	playerCards[0] = GetRandomCard();
+	playerCards[1] = GetRandomCard();
+	dealerCards[0] = GetRandomCard();
+	dealerCards[1] = GetRandomCard();
 
 	cout << "Dealing cards now: \n";
 	Sleep(1500);
-	cout << "Your first card is: " << pCard1 << "\n";
+	cout << "Your first card is: " << playerCards[0] << "\n";
 	Sleep(1500);
-	cout << "Dealer's first card is: " << hCard1 << "\n";
+	cout << "Dealer's first card is: " << dealerCards[0] << "\n";
 	Sleep(1500);
-	cout << "Your second card is: " << pCard2 << "\n";
+	cout << "Your second card is: " << playerCards[1] << "\n";
 	Sleep(1500);
 	cout << "Dealer's second card is: X \n";
 	Sleep(1500);
 
-	pCardSum = pCard1 + pCard2;
-	hCardSum = hCard1 + hCard2;
-
-	// check if both sums == 21; - > return bet
-	// check if pCardSum == 21; - > player gets 150% bet
-	// check if hCardSum == 21; - > player lose bet
-	// check if card1 and 2 are 11; -> second one is = 1
+	int pCardSum = CalculatePlayerCardSum();
+	int hCardSum = CalculateDealerCardSum();
 
 	if (pCardSum == 21 && hCardSum == 21)
 	{
@@ -109,24 +110,147 @@ void StartOfGame()
 		// house wins
 		return;
 	}
-	else if (pCardSum == 22)
+	
+	//if 2 Aces
+	if (pCardSum == 22)
 	{
-		pCard2 = 1;
+		playerCards[1] = 1;
 	}
-	else if (hCardSum == 22)
+	if (hCardSum == 22)
 	{
-		hCard2 = 1;
+		dealerCards[1] = 1;
 	}
 	
-	cout << "Your sum of cards for now is: " << pCard1 + pCard2 << "\nWould you like another card? \n";
+	PlayerDrawing();
+	if (CalculatePlayerCardSum() > 21)
+	{
+		cout << "You bust. \n";
+		return;
+	}
+
+	DealerDrawing();
+}
+
+void PlayerDrawing()
+{
+	cout << "Your sum of cards for now is: " << CalculatePlayerCardSum() << "\nWould you like another card? (Y/N) \n";
 	cin >> playerAnswer;
 
+	while (playerAnswer == 'Y')
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			if (playerCards[i] == 0)
+			{
+				int playerSum = CalculatePlayerCardSum();
+				playerCards[i] = GetRandomCard();
+				if (playerCards[i] == 11 && playerSum > 10)
+				{
+					playerCards[i] = 1;
+				}
+				cout << "You drew: " << playerCards[i] << "\n";
+				Sleep(1500);
 
+				playerSum = CalculatePlayerCardSum();
+				cout << "Your sum of cards for now is: " << playerSum << "\n";
+				Sleep(1500);
+				if (playerSum > 21)
+				{
+					return;
+				}
+				break;
+			}
+		}
+
+		cout << "Would you like another card ? (Y / N) \n";
+		cin >> playerAnswer;
+	}
+
+
+}
+
+void DealerDrawing()
+{
+	cout << "Dealer's second card is: " << dealerCards[1]<<  "\n";
+	Sleep(1500);
+
+	cout << "Dealer's sum of cards is: " << CalculateDealerCardSum() << "\n";
+	Sleep(1500);
+
+	while (CalculateDealerCardSum() < 17)
+	{
+		cout << "Dealer's total sum of cards is less than 17. Drawing.\n";
+		Sleep(1500);
+		for (int i = 0; i < 10; i++)
+		{
+			if (dealerCards[i] == 0)
+			{
+				int dealerSum = CalculateDealerCardSum();
+				dealerCards[i] = GetRandomCard();
+				if (dealerCards[i] == 11 && dealerSum > 10)
+				{
+					dealerCards[i] = 1;
+				}
+				cout << "Dealer drew: " << dealerCards[i] <<  "\n";
+				Sleep(1500);
+
+				dealerSum = CalculateDealerCardSum();
+				cout << "Dealer's sum of cards for now is: " << dealerSum << "\n";
+				Sleep(1500);
+				if (dealerSum > 21)
+				{
+					cout << "Dealer bust. \n";
+					return;
+				}
+				break;
+			}
+		}
+
+	}
+}
+
+void PlayerWins()
+{
+
+}
+
+void DealerWins()
+{
+
+}
+
+void Tie()
+{
+
+}
+
+
+int CalculatePlayerCardSum()
+{
+	int pCardSum = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		pCardSum += playerCards[i];
+	}
+
+	return pCardSum;
+}
+
+int CalculateDealerCardSum()
+{
+	int hCardSum = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		hCardSum += dealerCards[i];
+	}
+
+	return hCardSum;
 }
 
 int GetRandomCard()
 {
 	int randomCardIndex = rand() % 52;
+	//when a card is alredy drawn - replace it with -1
 	while (arrayOfCards[randomCardIndex] == -1)
 	{
 		randomCardIndex = rand() % 52;
