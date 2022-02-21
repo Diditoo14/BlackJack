@@ -1,0 +1,3 @@
+# BlackJack
+
+This program is a representation of the BlackJack casino banking game. But instead in the casino, the game takes place in Visual Studio. At the start of the game the player gives their bet and then the cards are dealed. The player then can decide whether to draw another card or to see the results from the game. At the end of the game, the gambled money are added/withdraw to/from the player totals bet depending if he has won or lost the game. After he's done with a signle game, he can start a new one if he has any money left. The program for the BlackJack card game has been written in C++.
